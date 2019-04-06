@@ -5,14 +5,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="12.0" layoutY="31.0" text="Server" />
       <Label layoutX="12.0" layoutY="78.0" text="Port" />
-      <TextField layoutX="54.0" layoutY="27.0" prefHeight="25.0" prefWidth="435.0" promptText="best.server.com" />
-      <TextField layoutX="54.0" layoutY="74.0" prefHeight="25.0" prefWidth="435.0" promptText="6969" />
-      <Button fx:id="connect" layoutX="426.0" layoutY="211.0" mnemonicParsing="false" text="Connect" onAction="#connect" />
-      <Button fx:id="cancel" layoutX="14.0" layoutY="211.0" mnemonicParsing="false" text="Cancel" onAction="#cancel"/>
+      <TextField fx:id="host" layoutX="54.0" layoutY="27.0" prefHeight="25.0" prefWidth="435.0" promptText="best.server.com" />
+      <TextField fx:id="port" layoutX="54.0" layoutY="74.0" prefHeight="25.0" prefWidth="435.0" promptText="6969" />
+      <Button fx:id="connect" layoutX="426.0" layoutY="211.0" mnemonicParsing="false" onAction="#connect" text="Connect" />
+      <Button fx:id="cancel" layoutX="14.0" layoutY="211.0" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
+      <Label layoutX="12.0" layoutY="117.0" text="Nickname" />
+      <TextField fx:id="username" layoutX="77.0" layoutY="113.0" prefHeight="25.0" prefWidth="100.0" text="FKD13" />
    </children>
 </AnchorPane>

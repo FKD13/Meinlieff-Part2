@@ -6,13 +6,13 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ListView layoutX="14.0" layoutY="14.0" prefHeight="374.0" prefWidth="287.0" />
+      <ListView fx:id="listView" layoutX="14.0" layoutY="14.0" prefHeight="374.0" prefWidth="287.0" />
       <Button layoutX="310.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="276.0" text="Be Challenged" />
       <Label layoutX="310.0" layoutY="51.0" text="or Challenge" />
       <TextField layoutX="390.0" layoutY="47.0" prefHeight="25.0" prefWidth="111.0" />
       <Button layoutX="518.0" layoutY="47.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="68.0" text="Chalenge" />
+      <Button fx:id="refresh" onAction="#refresh" layoutX="310.0" layoutY="361.0" mnemonicParsing="false" text="Refresh" />
    </children>
 </AnchorPane>

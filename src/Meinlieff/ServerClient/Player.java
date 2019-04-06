@@ -8,7 +8,6 @@ public class Player {
         this.naam = naam;
     }
 
-    @Override
     public String toString() {
         return naam;
     }

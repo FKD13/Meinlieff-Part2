@@ -1,5 +1,6 @@
 package Meinlieff;
 
+import Meinlieff.MainMenu.MainMenuController;
 import Meinlieff.ServerSelection.ServerSelectionController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -28,11 +29,11 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
     }
 
-    public void openMainMenu(String host, int port) {
+    public void openMainMenu(String host, int port, String username) {
         try {
             primaryStage.hide();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenu/MainMenu.fxml"));
-            //loader.setController(new ServerSelectionController(this));
+            loader.setController(new MainMenuController(this, host, port, username));
             primaryStage.setScene(new Scene(loader.load()));
             primaryStage.show();
         } catch (Exception e) {
