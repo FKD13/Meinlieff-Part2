@@ -1,6 +1,9 @@
 package Meinlieff.ServerClient;
 
-import Meinlieff.ServerClient.ServerTasks.QuequeTask;
+import Meinlieff.Companion;
+import Meinlieff.MainMenu.MainMenuCompanion;
+import Meinlieff.ServerClient.ServerTasks.QueueTask;
+import javafx.beans.InvalidationListener;
 import javafx.concurrent.Task;
 
 import java.io.BufferedReader;
@@ -8,52 +11,70 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class Client {
+
+    private String name = "Client";
 
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
 
-    public void connect(String host, int port) {
-        // if (socket.isConnected()) {
-        //     disconnect();
-        // }
-        System.out.println("connect");
+    public boolean connect(String host, int port) {
         try {
             socket = new Socket(host, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (UnknownHostException e) {
-            System.err.println("[Client] " + e.getMessage());
+            try {
+                out = new PrintWriter(socket.getOutputStream(), true);
+                try {
+                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                } catch (IOException e) {
+                    printError(e);
+                    out.close();
+                    try {
+                        socket.close();
+                    } catch (IOException ex) {
+                        printError(ex);
+                    }
+                    return false;
+                }
+            } catch (IOException e) {
+                printError(e);
+                try {
+                    socket.close();
+                } catch (IOException ex) {
+                    printError(ex);
+                }
+                return false;
+            }
         } catch (IOException e) {
-            System.err.println("[Client] " + e.getMessage());
-            disconnect();
+            printError(e);
+            return false;
         }
+        System.out.println("connected!");
+        return true;
     }
 
-    public boolean login(String name) throws Exception {
-        out.println("I " + name);
-        return in.readLine().trim().equals("+");
-    }
-
-    public void disconnect() {
+    public boolean login(String username) {
+        String answer = "";
         try {
-            socket.close();
+            out.println("I " + username);
+            answer = in.readLine();
         } catch (IOException e) {
-            System.err.println("[Client] Error closing socket");
+            printError(e);
         }
-        out.close();
-        try {
-            in.close();
-        } catch (IOException e) {
-            System.err.println("[Client] Error closing BufferedReader in");
-        }
+        System.out.println("login!");
+        return answer.startsWith("+");
     }
 
-    // public Task<ArrayList<Player>> getQueque() {
-    //     return new QuequeTask(out, in);
-    // }
+    public Task<ArrayList<Player>> getQueue(InvalidationListener listener) {
+        Task<ArrayList<Player>> task = new QueueTask(out, in);
+        task.stateProperty().addListener(listener);
+        task.run();
+        return task;
+    }
+
+    private void printError(Exception e) {
+        System.err.println("[" + name + "] " + e.getCause());
+    }
 }
