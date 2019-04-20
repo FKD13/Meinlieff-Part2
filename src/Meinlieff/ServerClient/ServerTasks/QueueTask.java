@@ -19,7 +19,7 @@ public class QueueTask extends Task<ArrayList<Player>> {
     }
 
     @Override
-    protected ArrayList<Player> call() throws Exception {
+    protected ArrayList<Player> call() {
         ArrayList<Player> players = new ArrayList<>();
         out.println("W");
         try {

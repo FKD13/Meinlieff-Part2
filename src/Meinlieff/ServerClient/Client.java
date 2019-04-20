@@ -2,7 +2,9 @@ package Meinlieff.ServerClient;
 
 import Meinlieff.Companion;
 import Meinlieff.MainMenu.MainMenuCompanion;
+import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
 import Meinlieff.ServerClient.ServerTasks.QueueTask;
+import Meinlieff.ServerClient.ServerTasks.QueueTaskListener;
 import javafx.beans.InvalidationListener;
 import javafx.concurrent.Task;
 
@@ -67,10 +69,15 @@ public class Client {
         return answer.startsWith("+");
     }
 
-    public Task<ArrayList<Player>> getQueue(InvalidationListener listener) {
+    public Task<ArrayList<Player>> getQueue(QueueTaskListener queueTaskListener) {
         Task<ArrayList<Player>> task = new QueueTask(out, in);
-        task.stateProperty().addListener(listener);
-        task.run();
+        task.stateProperty().addListener(queueTaskListener);
+        queueTaskListener.setTask(task);
+        return task;
+    }
+
+    public AwaitResponseTask getAwaitResponseTask(String line) {
+        AwaitResponseTask task = new AwaitResponseTask(out, in, line);
         return task;
     }
 

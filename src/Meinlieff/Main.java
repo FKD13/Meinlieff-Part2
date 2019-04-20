@@ -1,5 +1,6 @@
 package Meinlieff;
 
+import Meinlieff.BoardPicker.BoardPickerCompanion;
 import Meinlieff.ServerSelection.ServerSelectionCompanion;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +19,10 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Meinlieff/ServerSelection/ServerSelection.fxml"));
         loader.setController(new ServerSelectionCompanion(this));
+
+        // FXMLLoader loader = new FXMLLoader(getClass().getResource("/Meinlieff/BoardPicker/BoardPicker.fxml"));
+        // loader.setController(new BoardPickerCompanion(this));
+
         Scene scene = new Scene(loader.load());
 
         primaryStage.setResizable(false);
