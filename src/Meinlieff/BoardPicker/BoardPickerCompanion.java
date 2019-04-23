@@ -51,7 +51,7 @@ public class BoardPickerCompanion implements Companion {
 
     private void start() {
         if (validate()) {
-            //start game
+            System.out.println("[BoardPickerCompanion] the game starts");
         }
     }
 
