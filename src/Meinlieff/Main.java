@@ -1,6 +1,6 @@
 package Meinlieff;
 
-import Meinlieff.BoardPicker.BoardPickerCompanion;
+import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerSelection.ServerSelectionCompanion;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     private Stage primaryStage;
+    private Client client;
 
     public static void main(String[] args) {
         launch(args);
@@ -17,8 +18,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        client = new Client();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Meinlieff/ServerSelection/ServerSelection.fxml"));
-        loader.setController(new ServerSelectionCompanion(this));
+        loader.setController(new ServerSelectionCompanion(this, client));
 
         // FXMLLoader loader = new FXMLLoader(getClass().getResource("/Meinlieff/BoardPicker/BoardPicker.fxml"));
         // loader.setController(new BoardPickerCompanion(this));
@@ -43,6 +46,11 @@ public class Main extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void stop() {
+        client.disconnect();
     }
 
     /*

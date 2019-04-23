@@ -1,19 +1,11 @@
 package Meinlieff.ServerClient;
 
-import Meinlieff.Companion;
-import Meinlieff.MainMenu.MainMenuCompanion;
-import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
-import Meinlieff.ServerClient.ServerTasks.QueueTask;
-import Meinlieff.ServerClient.ServerTasks.QueueTaskListener;
-import javafx.beans.InvalidationListener;
-import javafx.concurrent.Task;
+import Meinlieff.ServerClient.ServerTasks.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Client {
 
@@ -23,6 +15,23 @@ public class Client {
     private PrintWriter out;
     private BufferedReader in;
 
+    public ConnectTask getConnectTask() {
+        return new ConnectTask(this);
+    }
+
+    public LoginTask getLoginTask() {
+        return new LoginTask(out, in);
+    }
+
+    public WaitTask getWaitTask() {return new WaitTask(out, in); }
+
+    public void setFields(Socket socket, PrintWriter out, BufferedReader in) {
+        this.socket = socket;
+        this.out = out;
+        this.in = in;
+    }
+
+    /*
     public boolean connect(String host, int port) {
         try {
             socket = new Socket(host, port);
@@ -68,12 +77,27 @@ public class Client {
         System.out.println("login!");
         return answer.startsWith("+");
     }
+     */
 
-    public Task<ArrayList<Player>> getQueue(QueueTaskListener queueTaskListener) {
-        Task<ArrayList<Player>> task = new QueueTask(out, in);
-        task.stateProperty().addListener(queueTaskListener);
-        queueTaskListener.setTask(task);
-        return task;
+    public void disconnect() {
+        if (socket != null && socket.isConnected()) {
+            out.close();
+            try {
+                socket.close();
+            } catch (IOException e) {
+                System.err.println("[Client] an error closing the socket, already Closed?");
+            }
+            try {
+                in.close();
+            } catch (IOException e) {
+                System.err.println("[Client] an error closing in chanel");
+            }
+            System.err.println("[Client] closing connection");
+        }
+    }
+
+    public QueueTask getQueueTask() {
+        return new QueueTask(out, in);
     }
 
     public AwaitResponseTask getAwaitResponseTask(String line) {

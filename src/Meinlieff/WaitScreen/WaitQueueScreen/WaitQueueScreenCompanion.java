@@ -4,17 +4,15 @@ import Meinlieff.BoardPicker.BoardPickerCompanion;
 import Meinlieff.Companion;
 import Meinlieff.Main;
 import Meinlieff.MainMenu.MainMenuCompanion;
-import Meinlieff.ResponseWaiter;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
-import Meinlieff.ServerClient.ServerTasks.AwaitResponseTaskListener;
 import Meinlieff.WaitScreen.WaitGameStartScreen.WaitGameStartScreenCompanion;
 import javafx.beans.Observable;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
-public class WaitQueueScreenCompanion implements Companion, ResponseWaiter {
+public class WaitQueueScreenCompanion implements Companion {
 
     @FXML
     public Button cancel;
@@ -31,7 +29,7 @@ public class WaitQueueScreenCompanion implements Companion, ResponseWaiter {
     public void initialize() {
         cancel.setOnAction((e) -> cancel());
         task = client.getAwaitResponseTask("P");
-        AwaitResponseTaskListener awaitResponseTaskListener = new AwaitResponseTaskListener(this, task);
+        task.stateProperty().addListener(this::server_Responded);
         new Thread(task).start();
     }
 
@@ -42,11 +40,10 @@ public class WaitQueueScreenCompanion implements Companion, ResponseWaiter {
         }
     }
 
-    @Override
-    public void onResponse(AwaitResponseTaskListener awaitResponseTaskListener) {
+    private void server_Responded(Observable o) {
         if (task.getState().equals(Worker.State.SUCCEEDED)) {
             if (task.getLine().trim().equals("P")) {
-                String response = awaitResponseTaskListener.getTask().getValue();
+                String response = task.getValue();
                 if (response.charAt(2) == 'F') {
                     main.openWindow("/Meinlieff/BoardPicker/BoardPicker.fxml", new BoardPickerCompanion(main, client));
                 } else {

@@ -1,6 +1,7 @@
 package Meinlieff.BoardPicker;
 
 import Meinlieff.Companion;
+import Meinlieff.GameBoard.GameBoardCompanion;
 import Meinlieff.Main;
 import Meinlieff.MainMenu.MainMenuCompanion;
 import Meinlieff.ServerClient.Client;
@@ -46,12 +47,17 @@ public class BoardPickerCompanion implements Companion {
         }
         start.setOnAction((e) -> start());
         clear.setOnAction((e) -> clear());
-        cancel.setOnAction((e) -> cancel());
+        //cancel.setOnAction((e) -> cancel());
+        // to prevent serverComm. from breaking
+        cancel.setDisable(true);
     }
 
+    // todo replace serr with errorLabel
     private void start() {
         if (validate()) {
-            //start game
+            main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(client, coorinates, true));
+        } else {
+            System.err.println("invalid field");
         }
     }
 
@@ -62,10 +68,12 @@ public class BoardPickerCompanion implements Companion {
         }
     }
 
+    // todo this breaks the server communication
     private void cancel() {
         main.openWindow("/Meinlieff/MainMenu/MainMenu.fxml", new MainMenuCompanion(main, client));
     }
 
+    //todo when a field is invalid it should stop checking
     private boolean validate() {
         coorinates = "X";
         boolean[][] field = new boolean[10][10];
@@ -88,13 +96,11 @@ public class BoardPickerCompanion implements Companion {
                             field[x + 1][y + 1] = true;
                             done += 1;
                         } else {
-                            System.err.println("invalid field");
                             valid = false;
                         }
                     }
                 } else {
                     if (!buttons[x][y].isSelected()) {
-                        System.err.println("invalid field");
                         valid = false;
                     } else {
                         done+= 1;
