@@ -9,12 +9,12 @@
    <children>
       <Label layoutX="12.0" layoutY="31.0" text="Server" />
       <Label layoutX="12.0" layoutY="78.0" text="Port" />
-      <TextField fx:id="host" layoutX="54.0" layoutY="27.0" prefHeight="25.0" prefWidth="435.0" promptText="best.server.com" />
-      <TextField fx:id="port" layoutX="54.0" layoutY="74.0" prefHeight="25.0" prefWidth="435.0" promptText="6969" />
+      <TextField fx:id="host" layoutX="54.0" layoutY="27.0" prefHeight="25.0" prefWidth="435.0" text="meinlieff.smessie.com" />
+      <TextField fx:id="port" layoutX="54.0" layoutY="74.0" prefHeight="25.0" prefWidth="435.0" text="9987" />
       <Button fx:id="connect" layoutX="426.0" layoutY="211.0" mnemonicParsing="false" text="Connect" />
       <Button fx:id="cancel" layoutX="14.0" layoutY="211.0" mnemonicParsing="false" text="Cancel" />
       <Label layoutX="12.0" layoutY="117.0" text="Nickname" />
-      <TextField fx:id="username" layoutX="77.0" layoutY="113.0" prefHeight="25.0" prefWidth="100.0" text="FKD13" />
+      <TextField fx:id="username" layoutX="77.0" layoutY="113.0" prefHeight="25.0" prefWidth="100.0" text="FKD" />
       <Label fx:id="errorLabel" layoutX="77.0" layoutY="215.0" prefHeight="17.0" prefWidth="337.0" text="Error Messages go Here..." />
    </children>
 </AnchorPane>

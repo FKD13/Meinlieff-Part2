@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class MainMenuCompanion implements Companion {
     public Button challenge;
     @FXML
     public Button enqueue;
+    @FXML
+    public Label errorLabel;
 
     public MainMenuCompanion(Main main,Client client) {
         this.main = main;
@@ -39,6 +42,9 @@ public class MainMenuCompanion implements Companion {
     }
 
     public void initialize() {
+        errorLabel.setVisible(false);
+        errorLabel.getStyleClass().add("warning");
+
         refresh.setOnAction((e) -> refresh_press());
         challenge.setOnAction((e) -> challenge_press());
         enqueue.setOnAction((e) -> enqueue());
@@ -55,6 +61,7 @@ public class MainMenuCompanion implements Companion {
     }
 
     private void refresh_press() {
+        errorLabel.setVisible(false);
         QueueTask task = client.getQueueTask();
         task.stateProperty().addListener(this::updateListView);
         new Thread(task).start();
@@ -66,7 +73,8 @@ public class MainMenuCompanion implements Companion {
             task.stateProperty().addListener(this::challenge);
             new Thread(task).start();
         } else {
-            //todo "You should choose an opponent"
+            errorLabel.setVisible(true);
+            errorLabel.setText("U should choose an opponent");
         }
     }
 
@@ -74,7 +82,6 @@ public class MainMenuCompanion implements Companion {
         AwaitResponseTask task = (AwaitResponseTask) ((Property) o).getBean();
         if (task.getState().equals(Worker.State.SUCCEEDED)) {
             String response = task.getValue();
-            System.out.println(response);
             System.err.println(response);
             if (response.split(" ")[1].equals("T")) {
                 main.openWindow("/Meinlieff/BoardPicker/BoardPicker.fxml", new BoardPickerCompanion(main, client));

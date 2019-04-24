@@ -3,6 +3,8 @@ package Meinlieff.GameBoard;
 import Meinlieff.Companion;
 import Meinlieff.ServerClient.Client;
 import javafx.fxml.FXML;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
@@ -30,7 +32,19 @@ public class GameBoardCompanion implements Companion {
         for (int i = 0; i <dimension.getY(); i++) {
             gridPane.addRow(i);
         }
-        gridPane.setGridLinesVisible(true);
+        for (int i = 0; i < dimension.getX(); i++) {
+            for (int j = 0; j < dimension.getY(); j++) {
+                ImageView imageView = null;
+                if (boardconfiguration.contains(new Point(i, j))) {
+                    imageView = new ImageView("/Images/wit-loper.png");
+                } else {
+                    imageView = new ImageView("/Images/empty.png");
+                }
+                imageView.setFitHeight(100);
+                imageView.setFitWidth(100);
+                gridPane.add(imageView, i, j);
+            }
+        }
     }
 
     private ArrayList<Point> parsePoints(String line) {

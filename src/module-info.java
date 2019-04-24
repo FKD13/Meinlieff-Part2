@@ -1,4 +1,4 @@
-open module Meinlieff.Part2 {
+open module Meinlieff {
     requires javafx.fxml;
     requires javafx.graphics;
     requires javafx.controls;
