@@ -63,7 +63,7 @@ public class MainMenuCompanion implements Companion {
     private void challenge_press() {
         if (listView.getSelectionModel().getSelectedItem() != null) {
             AwaitResponseTask task = client.getAwaitResponseTask("C " + listView.getSelectionModel().getSelectedItem().toString());
-            task.stateProperty().addListener(this::challenge);
+            task.stateProperty().addListener((e) -> challenge(e));
             new Thread(task).start();
         } else {
             //todo "You should choose an opponent"
@@ -74,8 +74,6 @@ public class MainMenuCompanion implements Companion {
         AwaitResponseTask task = (AwaitResponseTask) ((Property) o).getBean();
         if (task.getState().equals(Worker.State.SUCCEEDED)) {
             String response = task.getValue();
-            System.out.println(response);
-            System.err.println(response);
             if (response.split(" ")[1].equals("T")) {
                 main.openWindow("/Meinlieff/BoardPicker/BoardPicker.fxml", new BoardPickerCompanion(main, client));
             } else {

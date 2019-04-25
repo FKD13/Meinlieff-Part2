@@ -44,7 +44,7 @@ public class WaitQueueScreenCompanion implements Companion {
         if (task.getState().equals(Worker.State.SUCCEEDED)) {
             if (task.getLine().trim().equals("P")) {
                 String response = task.getValue();
-                if (response.charAt(2) == 'F') {
+                if (response.charAt(2) == 'T') {
                     main.openWindow("/Meinlieff/BoardPicker/BoardPicker.fxml", new BoardPickerCompanion(main, client));
                 } else {
                     main.openWindow("/Meinlieff/WaitScreen/WaitGameStartScreen/WaitGameStartScreen.fxml", new WaitGameStartScreenCompanion(main, client));
