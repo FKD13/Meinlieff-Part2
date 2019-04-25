@@ -3,8 +3,6 @@ package Meinlieff.GameBoard;
 import Meinlieff.Companion;
 import Meinlieff.ServerClient.Client;
 import javafx.fxml.FXML;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
@@ -25,8 +23,43 @@ public class GameBoardCompanion implements Companion {
     }
 
     public void initialize() {
-        // initalize central gridpane
         Point dimension = getDimension();
+        initialize_gridPane(dimension);
+
+        // calculate the size of the tiles
+        double size = 800 / (dimension.getY() + 1);
+        if (dimension.getX() > dimension.getY()) {
+            size = 800 / (dimension.getX() + 1);
+        }
+        GameBoardModel boardModel = new GameBoardModel();
+        Tile[][] tiles = new Tile[dimension.getX() + 1][dimension.getY() + 1];
+
+        for (int i = 0; i <= dimension.getX(); i++) {
+            for (int j = 0; j <= dimension.getY(); j++) {
+                tiles[i][j] = new Tile(Piece.NULL);
+            }
+
+        }
+
+        for (Point p : boardconfiguration) {
+            tiles[p.getX()][p.getY()] = new Tile(Piece.EMPTY);
+        }
+
+        for (int i = 0; i <= dimension.getX(); i++) {
+            for (int j = 0; j <= dimension.getY(); j++) {
+                TileImageView tileImageView = new TileImageView(null, i, j);
+                tileImageView.setFitHeight(size);
+                tileImageView.setFitWidth(size);
+                gridPane.add(tileImageView, j, i);
+                boardModel.addListener(tileImageView);
+            }
+        }
+        boardModel.setTiles(tiles);
+    }
+
+    private void initialize_gridPane(Point dimension) {
+        // initalize central gridpane
+
         for (int i = 0; i <= dimension.getX(); i++) {
             gridPane.addColumn(i);
         }
@@ -39,28 +72,6 @@ public class GameBoardCompanion implements Companion {
         } else {
             gridPane.setPrefHeight(Math.ceil(800/(dimension.getY() + 1)) * (dimension.getX() + 1));
         }
-        // calculate the size of the tiles
-        double size = 800 / (dimension.getY() + 1);
-        if (dimension.getX() > dimension.getY()) {
-            size = 800 / (dimension.getX() + 1);
-        }
-
-        for (int i = 0; i <= dimension.getX(); i++) {
-            for (int j = 0; j <= dimension.getY(); j++) {
-                Image image = new Image("/Image/empty.png");
-                for (Point p : boardconfiguration) {
-                    if (p.toString().equals(new Point(i, j).toString())) {
-                        image = new Image("/Image/wit-loper.png");
-                    }
-                }
-                ImageView imageView = new ImageView(image);
-                imageView.setFitHeight(size);
-                imageView.setFitWidth(size);
-                gridPane.add(imageView, i, j);
-            }
-        }
-        System.out.println(dimension);
-        System.out.println(gridPane.getPrefHeight() + " " + gridPane.getPrefWidth());
     }
 
     private ArrayList<Point> parsePoints(String line) {
