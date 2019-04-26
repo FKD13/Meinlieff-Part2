@@ -39,7 +39,7 @@ public class AwaitResponseTask extends Task<String> {
         } catch (IOException e) {
             System.err.println("[AwaitResponseTask] an IOException while reading from BufferedReader");
         }
-        System.err.println(response);
+        System.out.println(response);
         return response;
     }
 }
