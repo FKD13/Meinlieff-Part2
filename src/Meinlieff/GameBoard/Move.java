@@ -4,21 +4,45 @@ import java.util.HashMap;
 
 public class Move {
 
-    private HashMap<String, Piece> map = new HashMap<>();
+    private HashMap<String, Piece> String_Piece = new HashMap<>();
+    private HashMap<Piece, String> Piece_String = new HashMap<>();
+
     private int x;
     private int y;
     private boolean isFinal;
     private Piece piece;
 
-    public Move(String line) {
-        map.put("+", Piece.TOWER);
-        map.put("X", Piece.RUNNER);
-        map.put("o", Piece.PULLER);
-        map.put("@", Piece.PUSHER);
+    public Move() {
+        String_Piece.put("+", Piece.TOWER);
+        String_Piece.put("X", Piece.RUNNER);
+        String_Piece.put("o", Piece.PULLER);
+        String_Piece.put("@", Piece.PUSHER);
+
+        Piece_String.put(Piece.TOWER, "+");
+        Piece_String.put(Piece.RUNNER, "X");
+        Piece_String.put(Piece.PULLER, "o");
+        Piece_String.put(Piece.PUSHER, "@");
+    }
+
+    public Move setData(String line) {
         String[] move = line.split(" ");
         this.x = Integer.parseInt(move[2]);
         this.y = Integer.parseInt(move[3]);
-        this.piece = map.get(move[4]);
+        this.piece = String_Piece.get(move[4]);
+        isFinal = move[1].equals("T");
+        return this;
+    }
+
+    public Move setData(int x, int y, Piece piece, boolean isFinal) {
+        this.x = x;
+        this.y = y;
+        this.piece = piece;
+        this.isFinal = isFinal;
+        return this;
+    }
+
+    public String toString() {
+        return "X " + (isFinal ? "T" : "F") + " " + x + " " + y + " " + Piece_String.get(piece);
     }
 
     public int getX() {

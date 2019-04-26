@@ -56,7 +56,12 @@ ToggleButton:selected {
     -fx-background-color: lime;
 }
 
-GridPane {
+.green {
     -fx-border-style: solid;
-    -fx-border-color: white;
+    -fx-border-color: lime;
+}
+
+.orange {
+    -fx-border-style: solid;
+    -fx-border-color: orange;
 }

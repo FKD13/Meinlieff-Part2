@@ -25,11 +25,11 @@ public class TileImageView extends ImageView implements InvalidationListener {
     }
 
     private void clicked() {
-        if (model.getTile(x, y).getPiece() == Piece.EMPTY) {
+        if (model.CanMove() && model.getTile(x, y).getPiece() == Piece.EMPTY) {
             if (model.getSelectedTile() != null) {
+                companion.sendServerMove(new Move().setData(x, y, model.getSelectedTile().getPiece(), false).toString());
                 model.setTile(x, y, model.getSelectedTile());
                 model.setSelectedTile(null);
-                companion.sendserverMove("X F " + x + " " + y + " @");
             }
         }
     }

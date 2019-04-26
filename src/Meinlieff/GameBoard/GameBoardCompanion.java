@@ -3,6 +3,7 @@ package Meinlieff.GameBoard;
 import Meinlieff.Companion;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.concurrent.Worker;
@@ -15,6 +16,7 @@ public class GameBoardCompanion implements Companion {
 
     private Client client;
     private ArrayList<Point> boardconfiguration;
+    private String board;
     private boolean color;
     private GameBoardModel boardModel;
 
@@ -29,12 +31,11 @@ public class GameBoardCompanion implements Companion {
         this.client = client;
         this.boardconfiguration = parsePoints(boardconfiguration);
         this.color = color;
-        if (color) {
-            sendserverMove(boardconfiguration);
-        }
+        this.board = boardconfiguration;
     }
 
     public void initialize() {
+        colorGameBoard();
         Point dimension = getDimension();
         initialize_gridPane(dimension);
 
@@ -45,18 +46,15 @@ public class GameBoardCompanion implements Companion {
         }
         boardModel = new GameBoardModel(color);
         Tile[][] tiles = new Tile[dimension.getX() + 1][dimension.getY() + 1];
-
         for (int i = 0; i <= dimension.getX(); i++) {
             for (int j = 0; j <= dimension.getY(); j++) {
                 tiles[i][j] = new Tile(Piece.NULL);
             }
 
         }
-
         for (Point p : boardconfiguration) {
             tiles[p.getX()][p.getY()] = new Tile(Piece.EMPTY);
         }
-
         for (int i = 0; i <= dimension.getX(); i++) {
             for (int j = 0; j <= dimension.getY(); j++) {
                 TileImageView tileImageView = new TileImageView(null, i, j, boardModel, this);
@@ -66,6 +64,10 @@ public class GameBoardCompanion implements Companion {
             }
         }
         boardModel.setTiles(tiles, fill_sidePane(true, boardModel), fill_sidePane(false, boardModel));
+        boardModel.setCanMove(true);
+        if (color) {
+            sendServerMove(board);
+        }
     }
 
     private Tile[] fill_sidePane(boolean color, GameBoardModel model) {
@@ -107,6 +109,17 @@ public class GameBoardCompanion implements Companion {
         }
     }
 
+    private void colorGameBoard() {
+        //make clear which color the player is playing as
+        String css_class = "green";
+        if (color) {
+            css_class = "orange";
+        }
+        gridPane.getStyleClass().add(css_class);
+        white_sidePane.getStyleClass().add("orange");
+        black_sidePane.getStyleClass().add("green");
+    }
+
     private ArrayList<Point> parsePoints(String line) {
         line = line.replace(" ", "").replace("X", "");
         ArrayList<Point> points = new ArrayList<>();
@@ -133,22 +146,29 @@ public class GameBoardCompanion implements Companion {
         return new Point(x, y);
     }
 
-    public void sendserverMove(String move) {
+    public void sendServerMove(String move) {
         AwaitResponseTask task = client.getAwaitResponseTask(move);
         task.stateProperty().addListener(this::gotMove);
         new Thread(task).start();
+        boardModel.setCanMove(false);
     }
 
     private void gotMove(Observable o) {
         AwaitResponseTask task = (AwaitResponseTask) ((Property) o).getBean();
         if (task.getState() == Worker.State.SUCCEEDED) {
-            Move move = new Move(task.getValue());
-            Tile tile = null;
-            int i = 0;
-            while (i < 8 && boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece() == move.getPiece())
-                i++;
-            tile = boardModel.getSideTile(i, !boardModel.getPlayerColor());
-            boardModel.setTile(move.getX(), move.getY(), tile);
+            if (! task.getValue().trim().equals("Q")) {
+                Move move = new Move().setData(task.getValue());
+                System.out.println(move.getPiece());
+                int i = 0;
+                while (i < 8 && boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece() != move.getPiece())
+                    i++;
+                System.out.println(i + " " + boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece());
+                Tile tile = boardModel.getSideTile(i, !boardModel.getPlayerColor());
+                boardModel.setTile(move.getX(), move.getY(), tile);
+                boardModel.setCanMove(true);
+            } else {
+                Platform.exit();
+            }
         }
     }
 }

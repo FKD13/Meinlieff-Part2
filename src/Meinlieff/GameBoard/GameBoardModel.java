@@ -14,10 +14,19 @@ public class GameBoardModel implements Observable {
     private ArrayList<InvalidationListener> listeners;
     private Tile selectedTile;
     private boolean playerColor;
+    private boolean canMove;
 
     public GameBoardModel(boolean playerColor) {
         this.playerColor = playerColor;
         listeners = new ArrayList<>();
+    }
+
+    public boolean CanMove() {
+        return canMove;
+    }
+
+    public void setCanMove(boolean canMove) {
+        this.canMove = canMove;
     }
 
     public boolean getPlayerColor() {
