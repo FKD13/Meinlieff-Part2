@@ -32,6 +32,7 @@ public class AwaitResponseTask extends Task<String> {
 
     @Override
     protected String call() {
+        System.out.println(line);
         String response = "";
         out.println(line);
         try {

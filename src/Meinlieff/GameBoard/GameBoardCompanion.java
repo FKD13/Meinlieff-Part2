@@ -2,6 +2,10 @@ package Meinlieff.GameBoard;
 
 import Meinlieff.Companion;
 import Meinlieff.ServerClient.Client;
+import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
+import javafx.beans.Observable;
+import javafx.beans.property.Property;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 
@@ -12,14 +16,22 @@ public class GameBoardCompanion implements Companion {
     private Client client;
     private ArrayList<Point> boardconfiguration;
     private boolean color;
+    private GameBoardModel boardModel;
 
     @FXML
     public GridPane gridPane;
+    @FXML
+    public GridPane white_sidePane;
+    @FXML
+    public GridPane black_sidePane;
 
     public GameBoardCompanion(Client client, String boardconfiguration, boolean color) {
         this.client = client;
         this.boardconfiguration = parsePoints(boardconfiguration);
         this.color = color;
+        if (color) {
+            sendserverMove(boardconfiguration);
+        }
     }
 
     public void initialize() {
@@ -31,7 +43,7 @@ public class GameBoardCompanion implements Companion {
         if (dimension.getX() > dimension.getY()) {
             size = 800 / (dimension.getX() + 1);
         }
-        GameBoardModel boardModel = new GameBoardModel();
+        boardModel = new GameBoardModel(color);
         Tile[][] tiles = new Tile[dimension.getX() + 1][dimension.getY() + 1];
 
         for (int i = 0; i <= dimension.getX(); i++) {
@@ -47,14 +59,35 @@ public class GameBoardCompanion implements Companion {
 
         for (int i = 0; i <= dimension.getX(); i++) {
             for (int j = 0; j <= dimension.getY(); j++) {
-                TileImageView tileImageView = new TileImageView(null, i, j);
+                TileImageView tileImageView = new TileImageView(null, i, j, boardModel, this);
                 tileImageView.setFitHeight(size);
                 tileImageView.setFitWidth(size);
                 gridPane.add(tileImageView, j, i);
-                boardModel.addListener(tileImageView);
             }
         }
-        boardModel.setTiles(tiles);
+        boardModel.setTiles(tiles, fill_sidePane(true, boardModel), fill_sidePane(false, boardModel));
+    }
+
+    private Tile[] fill_sidePane(boolean color, GameBoardModel model) {
+        Tile[] tiles = new Tile[8];
+        tiles[0] = new Tile(Piece.PULLER);
+        tiles[1] = new Tile(Piece.PULLER);
+        tiles[2] = new Tile(Piece.PUSHER);
+        tiles[3] = new Tile(Piece.PUSHER);
+        tiles[4] = new Tile(Piece.TOWER);
+        tiles[5] = new Tile(Piece.TOWER);
+        tiles[6] = new Tile(Piece.RUNNER);
+        tiles[7] = new Tile(Piece.RUNNER);
+        for (int i = 0; i < 8; i++) {
+            SideTileImageView view = new SideTileImageView(i, color, model);
+            if (color) {
+                white_sidePane.add(view, 0, i);
+            } else {
+                black_sidePane.add(view, 0, i);
+            }
+            tiles[i].setColor(color);
+        }
+        return tiles;
     }
 
     private void initialize_gridPane(Point dimension) {
@@ -98,5 +131,24 @@ public class GameBoardCompanion implements Companion {
             }
         }
         return new Point(x, y);
+    }
+
+    public void sendserverMove(String move) {
+        AwaitResponseTask task = client.getAwaitResponseTask(move);
+        task.stateProperty().addListener(this::gotMove);
+        new Thread(task).start();
+    }
+
+    private void gotMove(Observable o) {
+        AwaitResponseTask task = (AwaitResponseTask) ((Property) o).getBean();
+        if (task.getState() == Worker.State.SUCCEEDED) {
+            Move move = new Move(task.getValue());
+            Tile tile = null;
+            int i = 0;
+            while (i < 8 && boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece() == move.getPiece())
+                i++;
+            tile = boardModel.getSideTile(i, !boardModel.getPlayerColor());
+            boardModel.setTile(move.getX(), move.getY(), tile);
+        }
     }
 }

@@ -39,6 +39,7 @@ ListView {
 .list-cell:selected {
     -fx-border-style: solid;
     -fx-border-color: lime;
+    -fx-border-radius: 3px;
 ;
 }
 
@@ -53,4 +54,9 @@ ToggleButton {
 
 ToggleButton:selected {
     -fx-background-color: lime;
+}
+
+GridPane {
+    -fx-border-style: solid;
+    -fx-border-color: white;
 }
