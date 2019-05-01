@@ -1,15 +1,21 @@
 package Meinlieff.WaitScreen.WaitGameStartScreen;
 
+import Meinlieff.BoardPicker.GameBoardCompanionInitializer;
 import Meinlieff.Companion;
 import Meinlieff.GameBoard.GameBoardCompanion;
+import Meinlieff.GameBoard.Point;
+import Meinlieff.GameFinished.GameFinishedCompanion;
 import Meinlieff.Main;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerClient.ServerTasks.WaitTask;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.concurrent.Worker;
 
-public class WaitGameStartScreenCompanion implements Companion {
+import java.util.ArrayList;
+
+public class WaitGameStartScreenCompanion extends GameBoardCompanionInitializer implements Companion {
 
     private Main main;
     private Client client;
@@ -28,7 +34,16 @@ public class WaitGameStartScreenCompanion implements Companion {
     private void start(Observable o) {
         WaitTask task = (WaitTask) ((Property) o).getBean();
         if (task.getState() == Worker.State.SUCCEEDED) {
-            main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(client, task.getValue().trim(), false));
+            System.out.println(task.getValue().trim());
+            ArrayList<Point> points = parsePoints(task.getValue().trim());
+            if (securityCheck(points)) {
+                main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(main, client, parsePoints(task.getValue().trim()), false, task.getValue().trim()));
+            } else {
+                main.openWindow("/Meinlieff/GameFinished/GameFinished.fxml", new GameFinishedCompanion(main, "Your opponent has send an invalid board"));
+            }
         }
     }
+
+
+
 }

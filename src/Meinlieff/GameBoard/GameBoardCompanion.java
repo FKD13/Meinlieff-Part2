@@ -1,6 +1,8 @@
 package Meinlieff.GameBoard;
 
 import Meinlieff.Companion;
+import Meinlieff.GameFinished.GameFinishedCompanion;
+import Meinlieff.Main;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
 import javafx.application.Platform;
@@ -19,6 +21,7 @@ public class GameBoardCompanion implements Companion {
     private String board;
     private boolean color;
     private GameBoardModel boardModel;
+    private Main main;
 
     @FXML
     public GridPane gridPane;
@@ -27,11 +30,12 @@ public class GameBoardCompanion implements Companion {
     @FXML
     public GridPane black_sidePane;
 
-    public GameBoardCompanion(Client client, String boardconfiguration, boolean color) {
+    public GameBoardCompanion(Main main, Client client, ArrayList<Point> boardconfiguration, boolean color, String board) {
+        this.main = main;
         this.client = client;
-        this.boardconfiguration = parsePoints(boardconfiguration);
+        this.boardconfiguration = boardconfiguration;
         this.color = color;
-        this.board = boardconfiguration;
+        this.board = board;
     }
 
     public void initialize() {
@@ -120,18 +124,6 @@ public class GameBoardCompanion implements Companion {
         black_sidePane.getStyleClass().add("green");
     }
 
-    private ArrayList<Point> parsePoints(String line) {
-        line = line.replace(" ", "").replace("X", "");
-        ArrayList<Point> points = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            points.add(new Point(Integer.parseInt(line.charAt(i * 2) + ""), Integer.parseInt(line.charAt(i * 2 + 1) + "")));
-            points.add(new Point(Integer.parseInt(line.charAt(i * 2) + "") + 1, Integer.parseInt(line.charAt(i * 2 + 1) + "")));
-            points.add(new Point(Integer.parseInt(line.charAt(i * 2) + ""), Integer.parseInt(line.charAt(i * 2 + 1) + "") + 1));
-            points.add(new Point(Integer.parseInt(line.charAt(i * 2) + "") + 1, Integer.parseInt(line.charAt(i * 2 + 1) + "") + 1));
-        }
-        return points;
-    }
-
     private Point getDimension() {
         int x = 0;
         int y = 0;
@@ -156,19 +148,58 @@ public class GameBoardCompanion implements Companion {
     private void gotMove(Observable o) {
         AwaitResponseTask task = (AwaitResponseTask) ((Property) o).getBean();
         if (task.getState() == Worker.State.SUCCEEDED) {
-            if (! task.getValue().trim().equals("Q")) {
-                Move move = new Move().setData(task.getValue());
-                System.out.println(move.getPiece());
-                int i = 0;
-                while (i < 8 && boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece() != move.getPiece())
-                    i++;
-                System.out.println(i + " " + boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece());
-                Tile tile = boardModel.getSideTile(i, !boardModel.getPlayerColor());
-                boardModel.setTile(move.getX(), move.getY(), tile);
-                boardModel.setCanMove(true);
+            String value = task.getValue().trim();
+            System.out.println(value);
+            if (! value.equals("Q")) {
+                // handle incoming move
+                if (value.matches("X [TF] [0-9] [0-9] [+@Xo]")) {
+                    doMove(value);
+                } else if (value.equals("X")) {
+                    boardModel.setPreviousMove(new Move().setData(0,0,Piece.EMPTY, false));
+                } else {
+                    quit("Opponent has send an unexpected line");
+                }
+                // send 'X' if necessary
+                int som = possibleMoves();
+                System.out.println("possible positions: " + som);
+                if (som > 0) {
+                    // if the incoming move is the final move, you should
+                    if (!boardModel.isFinalMove()) {
+                        boardModel.setCanMove(true);
+                    }
+                } else {
+                    // skip turn
+                    boardModel.setPreviousMove(new Move().setData(0,0,Piece.EMPTY, false));
+                    sendServerMove("X");
+                }
             } else {
-                Platform.exit();
+                quit("Your opponent left the game");
             }
         }
+    }
+    private void quit(String reason) {
+        main.openWindow("/Meinlieff/GameFinished/GameFinished.fxml", new GameFinishedCompanion(main, reason));
+    }
+
+    private void doMove(String value) {
+        Move move = new Move().setData(value);
+        int i = 0;
+        while (i < 8 && boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece() != move.getPiece())
+            i++;
+        Tile tile = boardModel.getSideTile(i, !boardModel.getPlayerColor());
+        if (! boardModel.setTile(move.getX(), move.getY(), tile)) {
+            // cheater
+            quit("Your opponent was cheating");
+        }
+    }
+
+    private int possibleMoves() {
+        int som = 0;
+        for (Point p : boardconfiguration) {
+            if (boardModel.validatePosition(p.getX(), p.getY())) {
+                som += 1;
+            }
+        }
+        return som;
     }
 }

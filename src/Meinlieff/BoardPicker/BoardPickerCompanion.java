@@ -5,13 +5,14 @@ import Meinlieff.GameBoard.GameBoardCompanion;
 import Meinlieff.Main;
 import Meinlieff.MainMenu.MainMenuCompanion;
 import Meinlieff.ServerClient.Client;
+import Meinlieff.ServerSelection.ServerSelectionCompanion;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 
-public class BoardPickerCompanion implements Companion {
+public class BoardPickerCompanion extends GameBoardCompanionInitializer implements Companion {
 
     @FXML
     public GridPane gridpane;
@@ -47,15 +48,13 @@ public class BoardPickerCompanion implements Companion {
         }
         start.setOnAction((e) -> start());
         clear.setOnAction((e) -> clear());
-        //cancel.setOnAction((e) -> cancel());
-        // to prevent serverComm. from breaking
-        cancel.setDisable(true);
+        cancel.setOnAction((e) -> cancel());
     }
 
     // todo replace serr with errorLabel
     private void start() {
         if (validate()) {
-            main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(client, coorinates, true));
+            main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(main, client, parsePoints(coorinates), true, coorinates));
         } else {
             System.err.println("invalid field");
         }
@@ -70,10 +69,12 @@ public class BoardPickerCompanion implements Companion {
 
     // todo this breaks the server communication
     private void cancel() {
-        main.openWindow("/Meinlieff/MainMenu/MainMenu.fxml", new MainMenuCompanion(main, client));
+        client.disconnect();
+        main.openWindow("/Meinlieff/ServerSelection/ServerSelection.fxml", new ServerSelectionCompanion(main, client));
     }
 
     //todo when a field is invalid it should stop checking
+    //todo when a field is moved one up the coordinates should shift back down
     private boolean validate() {
         coorinates = "X";
         boolean[][] field = new boolean[10][10];

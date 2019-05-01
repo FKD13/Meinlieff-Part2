@@ -12,6 +12,7 @@ public class GameBoardModel implements Observable {
     private Tile[] black_side;
 
     private ArrayList<InvalidationListener> listeners;
+    private Move previousMove = new Move().setData(0,0,Piece.EMPTY, false);
     private Tile selectedTile;
     private boolean playerColor;
     private boolean canMove;
@@ -20,7 +21,7 @@ public class GameBoardModel implements Observable {
         this.playerColor = playerColor;
         listeners = new ArrayList<>();
     }
-
+    // some simple getter end setters
     public boolean CanMove() {
         return canMove;
     }
@@ -41,6 +42,15 @@ public class GameBoardModel implements Observable {
         this.selectedTile = selectedTile;
     }
 
+    public Move getPreviousMove() {
+        return previousMove;
+    }
+
+    public void setPreviousMove(Move previousMove) {
+        this.previousMove = previousMove;
+    }
+
+    // set the board and sidepanes
     public void setTiles(Tile[][] tiles, Tile[] white_side, Tile[] black_side) {
         this.tiles = tiles;
         this.white_side = white_side;
@@ -60,11 +70,40 @@ public class GameBoardModel implements Observable {
         }
     }
 
-    public void setTile(int x, int y, Tile tile) {
-        tiles[x][y].setPiece(tile.getPiece());
-        tiles[x][y].setColor(tile.getColor());
-        tile.setPiece(Piece.NULL);
-        fireInvalidationEvent();
+    // set a tile on the board
+    public boolean setTile(int x, int y, Tile tile) {
+        if (validatePosition(x, y)) {
+            previousMove = new Move().setData(x, y, tile.getPiece(), false);
+            tiles[x][y].setPiece(tile.getPiece());
+            tiles[x][y].setColor(tile.getColor());
+            tile.setPiece(Piece.NULL);
+            fireInvalidationEvent();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isFinalMove() {
+        if (playerColor) {
+            return isFinal(white_side);
+        } else {
+            return isFinal(black_side);
+        }
+    }
+
+    private boolean isFinal(Tile[] tiles) {
+        int count = 0;
+        for (Tile t : tiles) {
+            if (t.getPiece() != Piece.NULL) {
+                count += 1;
+            }
+        }
+        return count == 0;
+    }
+
+    public boolean validatePosition(int x, int y) {
+        return tiles[x][y].getPiece() == Piece.EMPTY && previousMove.getPiece().isValidPosition(previousMove.getX(), previousMove.getY(), x, y);
     }
 
     private void fireInvalidationEvent() {

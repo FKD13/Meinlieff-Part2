@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public class MainMenuCompanion implements Companion {
     public Button challenge;
     @FXML
     public Button enqueue;
+    @FXML
+    public Label errorLabel;
 
     public MainMenuCompanion(Main main,Client client) {
         this.main = main;
@@ -39,6 +42,8 @@ public class MainMenuCompanion implements Companion {
     }
 
     public void initialize() {
+        errorLabel.setVisible(false);
+
         refresh.setOnAction((e) -> refresh_press());
         challenge.setOnAction((e) -> challenge_press());
         enqueue.setOnAction((e) -> enqueue());
@@ -55,18 +60,21 @@ public class MainMenuCompanion implements Companion {
     }
 
     private void refresh_press() {
+        errorLabel.setVisible(false);
         QueueTask task = client.getQueueTask();
         task.stateProperty().addListener(this::updateListView);
         new Thread(task).start();
     }
 
     private void challenge_press() {
+        errorLabel.setVisible(false);
         if (listView.getSelectionModel().getSelectedItem() != null) {
             AwaitResponseTask task = client.getAwaitResponseTask("C " + listView.getSelectionModel().getSelectedItem().toString());
             task.stateProperty().addListener((e) -> challenge(e));
             new Thread(task).start();
         } else {
-            //todo "You should choose an opponent"
+            errorLabel.setText("You should choose an opponent");
+            errorLabel.setVisible(true);
         }
     }
 

@@ -32,7 +32,7 @@ public class AwaitResponseTask extends Task<String> {
 
     @Override
     protected String call() {
-        System.out.println(line);
+        //System.out.println(line);
         String response = "";
         out.println(line);
         try {
@@ -40,7 +40,7 @@ public class AwaitResponseTask extends Task<String> {
         } catch (IOException e) {
             System.err.println("[AwaitResponseTask] an IOException while reading from BufferedReader");
         }
-        System.out.println(response);
+        //System.out.println(response);
         return response;
     }
 }

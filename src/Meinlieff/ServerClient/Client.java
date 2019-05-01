@@ -9,8 +9,6 @@ import java.net.Socket;
 
 public class Client {
 
-    private String name = "Client";
-
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
@@ -31,56 +29,9 @@ public class Client {
         this.in = in;
     }
 
-    /*
-    public boolean connect(String host, int port) {
-        try {
-            socket = new Socket(host, port);
-            try {
-                out = new PrintWriter(socket.getOutputStream(), true);
-                try {
-                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                } catch (IOException e) {
-                    printError(e);
-                    out.close();
-                    try {
-                        socket.close();
-                    } catch (IOException ex) {
-                        printError(ex);
-                    }
-                    return false;
-                }
-            } catch (IOException e) {
-                printError(e);
-                try {
-                    socket.close();
-                } catch (IOException ex) {
-                    printError(ex);
-                }
-                return false;
-            }
-        } catch (IOException e) {
-            printError(e);
-            return false;
-        }
-        System.out.println("connected!");
-        return true;
-    }
-
-    public boolean login(String username) {
-        String answer = "";
-        try {
-            out.println("I " + username);
-            answer = in.readLine();
-        } catch (IOException e) {
-            printError(e);
-        }
-        System.out.println("login!");
-        return answer.startsWith("+");
-    }
-     */
-
     public void disconnect() {
         if (socket != null && socket.isConnected()) {
+            out.println("Q");
             out.close();
             try {
                 socket.close();
@@ -92,7 +43,6 @@ public class Client {
             } catch (IOException e) {
                 System.err.println("[Client] an error closing in chanel");
             }
-            System.err.println("[Client] closing connection");
         }
     }
 
@@ -101,11 +51,6 @@ public class Client {
     }
 
     public AwaitResponseTask getAwaitResponseTask(String line) {
-        AwaitResponseTask task = new AwaitResponseTask(out, in, line);
-        return task;
-    }
-
-    private void printError(Exception e) {
-        System.err.println("[" + name + "] " + e.getCause());
+        return new AwaitResponseTask(out, in, line);
     }
 }

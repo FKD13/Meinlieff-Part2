@@ -11,6 +11,6 @@
       <Button fx:id="refresh" layoutX="310.0" layoutY="361.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="87.0" text="Refresh" />
       <Button fx:id="enqueue" layoutX="405.0" layoutY="361.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="87.0" text="Join WaitList" />
       <Button fx:id="challenge" layoutX="499.0" layoutY="361.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="87.0" text="Challenge" />
-      <Label fx:id="errorLabel" layoutX="322.0" layoutY="14.0" prefHeight="17.0" prefWidth="269.0" text="Errors go here..." />
+      <Label fx:id="errorLabel" layoutX="322.0" layoutY="14.0" prefHeight="17.0" prefWidth="269.0" styleClass="warning" text="Errors go here..." />
    </children>
 </AnchorPane>
