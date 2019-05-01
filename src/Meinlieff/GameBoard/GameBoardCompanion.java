@@ -14,6 +14,13 @@ import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
 
+/*
+todo:
+    - detect the end of the game
+    - calculate score
+    - implement part 1 again :(
+    - lots of testing :)
+ */
 public class GameBoardCompanion implements Companion {
 
     private Client client;
