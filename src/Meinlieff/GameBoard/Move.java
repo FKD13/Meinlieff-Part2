@@ -22,6 +22,10 @@ public class Move {
         Piece_String.put(Piece.RUNNER, "X");
         Piece_String.put(Piece.PULLER, "o");
         Piece_String.put(Piece.PUSHER, "@");
+        x = -1;
+        y = -1;
+        isFinal = false;
+        piece = Piece.NULL;
     }
 
     public Move setData(String line) {

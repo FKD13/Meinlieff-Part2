@@ -1,6 +1,5 @@
 package Meinlieff.Part1.Updated;
 
-import Meinlieff.GameBoard.GameBoardModel;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.image.ImageView;
@@ -19,8 +18,8 @@ public class SideTileImageView extends ImageView implements InvalidationListener
 
     @Override
     public void invalidated(Observable observable) {
-        GameBoardModel boardModel = (GameBoardModel) observable;
-        setImage(boardModel.getSideTile(nr, color).getPiece().getImage(color));
+        PartOneModel boardModel = (PartOneModel) observable;
+        setImage(boardModel.getSide(color, nr).getPiece().getImage(color));
     }
 }
 

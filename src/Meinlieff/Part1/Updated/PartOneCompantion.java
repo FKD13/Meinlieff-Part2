@@ -35,6 +35,7 @@ public class PartOneCompantion {
     public VBox blackSide;
 
     public PartOneCompantion(String host, int port) {
+        moves = new ArrayList<>();
         model = new PartOneModel();
         client = new PartOneClient(host, port);
         client.connect();
@@ -42,14 +43,16 @@ public class PartOneCompantion {
     }
 
     private void fetchAllMoves() {
-        moves = new ArrayList<>();
-        Move move = new Move().setData(client.sendRequest("X"));
-        if (move != null) {
-            moves.add(move);
-            while (! move.isFinal()) {
-                move = new Move().setData(client.sendRequest("X"));
-                if (move != null) {
-                    moves.add(move);
+        if (client.isConnected()) {
+            moves = new ArrayList<>();
+            Move move = new Move().setData(client.sendRequest("X"));
+            if (move != null) {
+                moves.add(move);
+                while (!move.isFinal()) {
+                    move = new Move().setData(client.sendRequest("X"));
+                    if (move != null) {
+                        moves.add(move);
+                    }
                 }
             }
         }
@@ -71,6 +74,31 @@ public class PartOneCompantion {
             }
         }
         model.setTiles(tiles);
+        model.setSide(true, fill_sidePane(true, model));
+        model.setSide(false, fill_sidePane(false, model));
+        disableButtons();
+    }
+
+    private Tile[] fill_sidePane(boolean color, PartOneModel model) {
+        Tile[] tiles = new Tile[8];
+        tiles[0] = new Tile(Piece.PULLER);
+        tiles[1] = new Tile(Piece.PULLER);
+        tiles[2] = new Tile(Piece.PUSHER);
+        tiles[3] = new Tile(Piece.PUSHER);
+        tiles[4] = new Tile(Piece.TOWER);
+        tiles[5] = new Tile(Piece.TOWER);
+        tiles[6] = new Tile(Piece.RUNNER);
+        tiles[7] = new Tile(Piece.RUNNER);
+        for (int i = 0; i < 8; i++) {
+            SideTileImageView view = new SideTileImageView(100, 100, color, i);
+            model.addListener(view);
+            if (color) {
+                whiteSide.getChildren().add(view);
+            } else {
+                blackSide.getChildren().add(view);
+            }
+        }
+        return tiles;
     }
 
     private void doAllMoves() {
@@ -81,6 +109,7 @@ public class PartOneCompantion {
         Move move = moves.get(index);
         model.setTile(move.getX(), move.getY(), move.getPiece());
         index++;
+        disableButtons();
         return moves.size() != index;
     }
 
@@ -88,10 +117,28 @@ public class PartOneCompantion {
         index--;
         Move move = moves.get(index);
         model.unsetTile(move.getX(), move.getY());
+        disableButtons();
         return index != 0;
     }
 
     private void undoAllMoves() {
         while (undoOneMove()) {}
+    }
+
+    private void disableButtons() {
+        doOne.setDisable(false);
+        undoOne.setDisable(false);
+        doAll.setDisable(false);
+        undoAll.setDisable(false);
+
+        if (index == 0) {
+            undoOne.setDisable(true);
+            undoAll.setDisable(true);
+        }
+
+        if (index == moves.size()) {
+            doAll.setDisable(true);
+            doOne.setDisable(true);
+        }
     }
 }
