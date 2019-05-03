@@ -101,6 +101,10 @@ public class PartOneCompantion {
         return tiles;
     }
 
+    public void prepareScreenshot() {
+        doAllMoves();
+    }
+
     private void doAllMoves() {
         while (doOneMove()) {}
     }

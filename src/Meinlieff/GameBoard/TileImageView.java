@@ -12,7 +12,6 @@ public class TileImageView extends ImageView implements InvalidationListener {
 
     private GameBoardModel model;
     private GameBoardCompanion companion;
-    private boolean isGameView;
 
     public TileImageView(Image image, int x, int y, GameBoardModel model, GameBoardCompanion companion) {
         super(image);
@@ -29,8 +28,17 @@ public class TileImageView extends ImageView implements InvalidationListener {
             if (model.getSelectedTile() != null) {
                 Piece p = model.getSelectedTile().getPiece();
                 if (model.setTile(x, y, model.getSelectedTile())) {
-                    companion.sendServerMove(new Move().setData(x, y, p, model.isFinalMove()).toString());
+                    Move move = new Move().setData(x, y, p, model.isFinalMove());
+                    companion.sendServerMove(new Move().setData(x, y, p, model.isFinalMove()));
                     model.setSelectedTile(null);
+                    // if (model.isGameEnd()) {
+                    //     //quit
+                    // } else {
+                    //     // you send last move, opponent can send one more move.
+                    //     if (move.isFinal()) {
+                    //         model.setGameEnd(true);
+                    //     }
+                    // }
                 }
             }
         }

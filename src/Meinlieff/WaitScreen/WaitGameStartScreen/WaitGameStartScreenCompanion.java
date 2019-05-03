@@ -39,7 +39,7 @@ public class WaitGameStartScreenCompanion extends GameBoardCompanionInitializer 
             if (securityCheck(points)) {
                 main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(main, client, parsePoints(task.getValue().trim()), false, task.getValue().trim()));
             } else {
-                main.openWindow("/Meinlieff/GameFinished/GameFinished.fxml", new GameFinishedCompanion(main, "Your opponent has send an invalid board"));
+                main.openWindow("/Meinlieff/GameFinished/GameFinished.fxml", new GameFinishedCompanion(main, client, "Your opponent has send an invalid board"));
             }
         }
     }

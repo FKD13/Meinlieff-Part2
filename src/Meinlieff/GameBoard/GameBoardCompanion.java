@@ -5,7 +5,6 @@ import Meinlieff.GameFinished.GameFinishedCompanion;
 import Meinlieff.Main;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerClient.ServerTasks.AwaitResponseTask;
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.concurrent.Worker;
@@ -16,19 +15,13 @@ import java.util.ArrayList;
 
 /*
 todo:
-    - detect the end of the game
+    - detect the end of the game: V
     - calculate score
-    - implement part 1 again :(
+    - change project to use some more class hierarchy
+    - detect possible nullpointers or errors...
     - lots of testing :)
  */
 public class GameBoardCompanion implements Companion {
-
-    private Client client;
-    private ArrayList<Point> boardconfiguration;
-    private String board;
-    private boolean color;
-    private GameBoardModel boardModel;
-    private Main main;
 
     @FXML
     public GridPane gridPane;
@@ -36,6 +29,12 @@ public class GameBoardCompanion implements Companion {
     public GridPane white_sidePane;
     @FXML
     public GridPane black_sidePane;
+    private Client client;
+    private ArrayList<Point> boardconfiguration;
+    private String board;
+    private boolean color;
+    private GameBoardModel boardModel;
+    private Main main;
 
     public GameBoardCompanion(Main main, Client client, ArrayList<Point> boardconfiguration, boolean color, String board) {
         this.main = main;
@@ -77,9 +76,14 @@ public class GameBoardCompanion implements Companion {
         boardModel.setTiles(tiles, fill_sidePane(true, boardModel), fill_sidePane(false, boardModel));
         boardModel.setCanMove(true);
         if (color) {
-            sendServerMove(board);
+            AwaitResponseTask awaitResponseTask = client.getAwaitResponseTask(board);
+            awaitResponseTask.stateProperty().addListener(this::gotMove);
+            new Thread(awaitResponseTask).start();
+            boardModel.setCanMove(false);
         }
     }
+
+
 
     private Tile[] fill_sidePane(boolean color, GameBoardModel model) {
         Tile[] tiles = new Tile[8];
@@ -114,9 +118,9 @@ public class GameBoardCompanion implements Companion {
         }
         //adjust the size of the gridpane to the dimension of the field
         if (dimension.getX() > dimension.getY()) {
-            gridPane.setPrefHeight(Math.ceil(800/(dimension.getX() + 1)) * (dimension.getY() + 1));
+            gridPane.setPrefHeight(Math.ceil(800 / (dimension.getX() + 1)) * (dimension.getY() + 1));
         } else {
-            gridPane.setPrefHeight(Math.ceil(800/(dimension.getY() + 1)) * (dimension.getX() + 1));
+            gridPane.setPrefHeight(Math.ceil(800 / (dimension.getY() + 1)) * (dimension.getX() + 1));
         }
     }
 
@@ -145,11 +149,23 @@ public class GameBoardCompanion implements Companion {
         return new Point(x, y);
     }
 
-    public void sendServerMove(String move) {
-        AwaitResponseTask task = client.getAwaitResponseTask(move);
-        task.stateProperty().addListener(this::gotMove);
-        new Thread(task).start();
-        boardModel.setCanMove(false);
+    public void sendServerMove(Move move) {
+        if (boardModel.isGameEnd()) {
+            // send move and quit
+            client.sendLine(move.toString());
+            //quit
+            quit("the game has ended! - you probably won");
+        } else {
+            // you send last move, opponent can send one more move.
+            AwaitResponseTask task = client.getAwaitResponseTask(move.toString());
+            task.stateProperty().addListener(this::gotMove);
+            new Thread(task).start();
+            boardModel.setCanMove(false);
+            if (move.isFinal()) {
+                boardModel.setGameEnd(true);
+            }
+        }
+
     }
 
     private void gotMove(Observable o) {
@@ -157,12 +173,16 @@ public class GameBoardCompanion implements Companion {
         if (task.getState() == Worker.State.SUCCEEDED) {
             String value = task.getValue().trim();
             System.out.println(value);
-            if (! value.equals("Q")) {
+            if (!value.equals("Q")) {
                 // handle incoming move
                 if (value.matches("X [TF] [0-9] [0-9] [+@Xo]")) {
                     doMove(value);
                 } else if (value.equals("X")) {
-                    boardModel.setPreviousMove(new Move().setData(0,0,Piece.EMPTY, false));
+                    // opponent skips turn
+                    boardModel.setPreviousMove(new Move().setData(0, 0, Piece.EMPTY, false));
+                    if (boardModel.isGameEnd()) {
+                        quit("you won, yay!!");
+                    }
                 } else {
                     quit("Opponent has send an unexpected line");
                 }
@@ -176,16 +196,18 @@ public class GameBoardCompanion implements Companion {
                     }
                 } else {
                     // skip turn
-                    boardModel.setPreviousMove(new Move().setData(0,0,Piece.EMPTY, false));
-                    sendServerMove("X");
+                    Move move = new Move().setData(0, 0, Piece.EMPTY, false);
+                    boardModel.setPreviousMove(move);
+                    sendServerMove(move);
                 }
             } else {
                 quit("Your opponent left the game");
             }
         }
     }
+
     private void quit(String reason) {
-        main.openWindow("/Meinlieff/GameFinished/GameFinished.fxml", new GameFinishedCompanion(main, reason));
+        main.openWindow("/Meinlieff/GameFinished/GameFinished.fxml", new GameFinishedCompanion(main, client, reason));
     }
 
     private void doMove(String value) {
@@ -194,9 +216,17 @@ public class GameBoardCompanion implements Companion {
         while (i < 8 && boardModel.getSideTile(i, !boardModel.getPlayerColor()).getPiece() != move.getPiece())
             i++;
         Tile tile = boardModel.getSideTile(i, !boardModel.getPlayerColor());
-        if (! boardModel.setTile(move.getX(), move.getY(), tile)) {
+        if (!boardModel.setTile(move.getX(), move.getY(), tile)) {
             // cheater
             quit("Your opponent was cheating");
+        }
+        if (boardModel.isGameEnd()) {
+            quit("Calculate Score");
+        } else {
+            if (move.isFinal()) {
+                // opponent send final move
+                boardModel.setGameEnd(true);
+            }
         }
     }
 

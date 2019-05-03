@@ -5,9 +5,15 @@ import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerSelection.ServerSelectionCompanion;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.WritableImage;
 import javafx.stage.Stage;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class Main extends Application {
 
@@ -31,18 +37,30 @@ public class Main extends Application {
             primaryStage.show();
 
             this.primaryStage = primaryStage;
-        } else if (getParameters().getRaw().size() == 2) {
+        } else if (getParameters().getRaw().size() == 2 || getParameters().getRaw().size() == 3) {
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/Meinlieff/Part1/PartOne.fxml"));
             // todo check if port is number
-            loader.setController(new PartOneCompantion(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1))));
+            PartOneCompantion partOneCompantion = new PartOneCompantion(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)));
+            loader.setController(partOneCompantion);
             Scene scene = new Scene(loader.load());
             primaryStage.setResizable(false);
             primaryStage.setTitle("Meinlieff");
             primaryStage.setScene(scene);
-            primaryStage.show();
-        } else if (getParameters().getRaw().size() == 3) {
-            // screenshot part 1
+
+            if (getParameters().getRaw().size() == 3) {
+                partOneCompantion.prepareScreenshot();
+                WritableImage writableImage = scene.snapshot(null);
+                BufferedImage fromFXImage = SwingFXUtils.fromFXImage(
+                        writableImage, null);
+                ImageIO.write(
+                        fromFXImage,
+                        "png",
+                        new File(getParameters().getRaw().get(2).replaceFirst("^~", System.getProperty("user.home"))));
+                Platform.exit();
+            } else {
+                primaryStage.show();
+            }
         } else {
             System.err.println("Usage: command [<host> <port> [<path>]]");
             Platform.exit();

@@ -46,7 +46,11 @@ public class Move {
     }
 
     public String toString() {
-        return "X " + (isFinal ? "T" : "F") + " " + x + " " + y + " " + Piece_String.get(piece);
+        if (piece != Piece.EMPTY) {
+            return "X " + (isFinal ? "T" : "F") + " " + x + " " + y + " " + Piece_String.get(piece);
+        } else {
+            return "X";
+        }
     }
 
     public int getX() {

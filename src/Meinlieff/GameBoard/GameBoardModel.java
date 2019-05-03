@@ -12,16 +12,27 @@ public class GameBoardModel implements Observable {
     private Tile[] black_side;
 
     private ArrayList<InvalidationListener> listeners;
-    private Move previousMove = new Move().setData(0,0,Piece.EMPTY, false);
+    private Move previousMove = new Move().setData(0, 0, Piece.EMPTY, false);
     private Tile selectedTile;
     private boolean playerColor;
     private boolean canMove;
+    private boolean gameEnd;
 
     public GameBoardModel(boolean playerColor) {
+        this.gameEnd = false;
         this.playerColor = playerColor;
         listeners = new ArrayList<>();
     }
+
     // some simple getter end setters
+    public boolean isGameEnd() {
+        return gameEnd;
+    }
+
+    public void setGameEnd(boolean gameEnd) {
+        this.gameEnd = gameEnd;
+    }
+
     public boolean CanMove() {
         return canMove;
     }
@@ -107,7 +118,7 @@ public class GameBoardModel implements Observable {
     }
 
     private void fireInvalidationEvent() {
-        for (InvalidationListener listener: listeners) {
+        for (InvalidationListener listener : listeners) {
             listener.invalidated(this);
         }
     }

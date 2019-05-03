@@ -13,6 +13,10 @@ public class Client {
     private PrintWriter out;
     private BufferedReader in;
 
+    public void sendLine(String line) {
+        out.println(line);
+    }
+
     public ConnectTask getConnectTask() {
         return new ConnectTask(this);
     }

@@ -2,6 +2,8 @@ package Meinlieff.GameFinished;
 
 import Meinlieff.Companion;
 import Meinlieff.Main;
+import Meinlieff.ServerClient.Client;
+import Meinlieff.ServerSelection.ServerSelectionCompanion;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,9 +20,11 @@ public class GameFinishedCompanion implements Companion {
     public Button play;
 
     private Main main;
+    private Client client;
     private String text;
 
-    public GameFinishedCompanion(Main main, String text) {
+    public GameFinishedCompanion(Main main, Client client, String text) {
+        this.client = client;
         this.main = main;
         this.text = text;
     }
@@ -36,7 +40,7 @@ public class GameFinishedCompanion implements Companion {
     }
 
     private void play() {
-        //todo start new game
-        System.out.println("this will start a new game");
+        client.disconnect();
+        main.openWindow("/Meinlieff/ServerSelection/ServerSelection.fxml", new ServerSelectionCompanion(main, client));
     }
 }
