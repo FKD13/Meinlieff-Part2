@@ -9,6 +9,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
@@ -27,6 +28,9 @@ public class GameBoardCompanion implements Companion {
     public GridPane white_sidePane;
     @FXML
     public GridPane black_sidePane;
+    @FXML
+    public Label messageLabel;
+
     private Client client;
     private ArrayList<Point> boardconfiguration;
     private String board;
@@ -78,6 +82,9 @@ public class GameBoardCompanion implements Companion {
             awaitResponseTask.stateProperty().addListener(this::gotMove);
             new Thread(awaitResponseTask).start();
             boardModel.setCanMove(false);
+            messageLabel.setText("The Game Has Begun, It's your opponents turn");
+        } else {
+            messageLabel.setText("The Game Has Begun, It's your turn");
         }
     }
 
@@ -162,6 +169,9 @@ public class GameBoardCompanion implements Companion {
             boardModel.setCanMove(false);
             if (move.isFinal()) {
                 boardModel.setGameEnd(true);
+                messageLabel.setText("It's your opponent's last turn");
+            } else {
+                messageLabel.setText("It's your opponent's turn");
             }
         }
 
@@ -183,6 +193,8 @@ public class GameBoardCompanion implements Companion {
                         int white = boardModel.getScore(true);
                         int black = boardModel.getScore(false);
                         quit("Score: " + white + " - " + black + "!");
+                    } else {
+                        messageLabel.setText("Your opponent had to skip a turn");
                     }
                 } else {
                     quit("Opponent has send an unexpected line");
@@ -200,6 +212,7 @@ public class GameBoardCompanion implements Companion {
                     Move move = new Move().setData(0, 0, Piece.EMPTY, false);
                     boardModel.setPreviousMove(move);
                     sendServerMove(move);
+                    messageLabel.setText("You had to skip a turn");
                 }
             } else {
                 quit("Your opponent left the game");
@@ -229,6 +242,9 @@ public class GameBoardCompanion implements Companion {
             if (move.isFinal()) {
                 // opponent send final move
                 boardModel.setGameEnd(true);
+                messageLabel.setText("It's your final move");
+            } else {
+                messageLabel.setText("It's your turn");
             }
         }
     }
