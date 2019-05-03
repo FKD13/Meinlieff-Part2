@@ -8,7 +8,6 @@ import Meinlieff.GameFinished.GameFinishedCompanion;
 import Meinlieff.Main;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerClient.ServerTasks.WaitTask;
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.Property;
 import javafx.concurrent.Worker;

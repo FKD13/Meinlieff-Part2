@@ -3,12 +3,12 @@ package Meinlieff.BoardPicker;
 import Meinlieff.Companion;
 import Meinlieff.GameBoard.GameBoardCompanion;
 import Meinlieff.Main;
-import Meinlieff.MainMenu.MainMenuCompanion;
 import Meinlieff.ServerClient.Client;
 import Meinlieff.ServerSelection.ServerSelectionCompanion;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 
@@ -22,6 +22,8 @@ public class BoardPickerCompanion extends GameBoardCompanionInitializer implemen
     public Button clear;
     @FXML
     public Button cancel;
+    @FXML
+    public Label errorLabel;
 
     private Main main;
     private Client client;
@@ -31,7 +33,7 @@ public class BoardPickerCompanion extends GameBoardCompanionInitializer implemen
     public BoardPickerCompanion(Main main, Client client) {
         this.main = main;
         this.client = client;
-        buttons = new ToggleButton[10][10];
+        buttons = new ToggleButton[11][11];
         coorinates = "X 0 0 2 0 0 2 2 2";
     }
 
@@ -39,6 +41,7 @@ public class BoardPickerCompanion extends GameBoardCompanionInitializer implemen
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 ToggleButton button = new ToggleButton();
+                button.setOnAction(e -> errorLabel.setVisible(false));
                 button.setMinWidth(30);
                 button.setMinHeight(30);
                 button.setVisible(true);
@@ -49,25 +52,27 @@ public class BoardPickerCompanion extends GameBoardCompanionInitializer implemen
         start.setOnAction((e) -> start());
         clear.setOnAction((e) -> clear());
         cancel.setOnAction((e) -> cancel());
+        errorLabel.getStyleClass().add("warning");
+        errorLabel.setVisible(false);
     }
 
-    // todo replace serr with errorLabel
     private void start() {
         if (validate()) {
             main.openWindow("/Meinlieff/GameBoard/GameBoard.fxml", new GameBoardCompanion(main, client, parsePoints(coorinates), true, coorinates));
         } else {
-            System.err.println("invalid field");
+            errorLabel.setVisible(true);
+            errorLabel.setText("Invalid Field");
         }
     }
 
     private void clear() {
+        errorLabel.setVisible(false);
         for (Node n : gridpane.getChildren()) {
             ToggleButton button = (ToggleButton) n;
             button.setSelected(false);
         }
     }
 
-    // todo this breaks the server communication
     private void cancel() {
         client.disconnect();
         main.openWindow("/Meinlieff/ServerSelection/ServerSelection.fxml", new ServerSelectionCompanion(main, client));

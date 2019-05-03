@@ -25,7 +25,7 @@ public class Client {
         return new LoginTask(out, in);
     }
 
-    public WaitTask getWaitTask() {return new WaitTask(out, in); }
+    public WaitTask getWaitTask() {return new WaitTask(in); }
 
     public void setFields(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;

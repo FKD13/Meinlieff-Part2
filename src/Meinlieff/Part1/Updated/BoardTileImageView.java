@@ -1,6 +1,5 @@
 package Meinlieff.Part1.Updated;
 
-import Meinlieff.GameBoard.GameBoardModel;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 

@@ -30,10 +30,12 @@ public class Move {
 
     public Move setData(String line) {
         String[] move = line.split(" ");
-        this.x = Integer.parseInt(move[2]);
-        this.y = Integer.parseInt(move[3]);
-        this.piece = String_Piece.get(move[4]);
-        isFinal = move[1].equals("T");
+        if (move.length == 5){
+            this.x = Integer.parseInt(move[2]);
+            this.y = Integer.parseInt(move[3]);
+            this.piece = String_Piece.get(move[4]);
+            isFinal = move[1].equals("T");
+        }
         return this;
     }
 

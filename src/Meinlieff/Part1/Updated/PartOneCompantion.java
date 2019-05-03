@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 
-//todo sidepanes, disable right buttons
 public class PartOneCompantion {
 
     private PartOneClient client;
@@ -38,21 +37,20 @@ public class PartOneCompantion {
         moves = new ArrayList<>();
         model = new PartOneModel();
         client = new PartOneClient(host, port);
-        client.connect();
-        fetchAllMoves();
+        if (client.connect()) {
+            fetchAllMoves();
+        }
     }
 
     private void fetchAllMoves() {
-        if (client.isConnected()) {
-            moves = new ArrayList<>();
-            Move move = new Move().setData(client.sendRequest("X"));
-            if (move != null) {
-                moves.add(move);
-                while (!move.isFinal()) {
-                    move = new Move().setData(client.sendRequest("X"));
-                    if (move != null) {
-                        moves.add(move);
-                    }
+        moves = new ArrayList<>();
+        Move move = new Move().setData(client.sendRequest("X"));
+        if (move != null) {
+            moves.add(move);
+            while (!move.isFinal()) {
+                move = new Move().setData(client.sendRequest("X"));
+                if (move != null) {
+                    moves.add(move);
                 }
             }
         }
@@ -111,7 +109,7 @@ public class PartOneCompantion {
 
     private boolean doOneMove() {
         Move move = moves.get(index);
-        model.setTile(move.getX(), move.getY(), move.getPiece());
+        model.setTile(move.getY(), move.getX(), move.getPiece());
         index++;
         disableButtons();
         return moves.size() != index;
@@ -120,7 +118,7 @@ public class PartOneCompantion {
     private boolean undoOneMove() {
         index--;
         Move move = moves.get(index);
-        model.unsetTile(move.getX(), move.getY());
+        model.unsetTile(move.getY(), move.getX());
         disableButtons();
         return index != 0;
     }

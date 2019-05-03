@@ -4,15 +4,12 @@ import javafx.concurrent.Task;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class WaitTask extends Task<String> {
 
-    private PrintWriter out;
     private BufferedReader in;
 
-    public WaitTask(PrintWriter out, BufferedReader in) {
-        this.out = out;
+    public WaitTask(BufferedReader in) {
         this.in = in;
     }
 

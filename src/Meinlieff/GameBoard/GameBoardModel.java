@@ -53,10 +53,6 @@ public class GameBoardModel implements Observable {
         this.selectedTile = selectedTile;
     }
 
-    public Move getPreviousMove() {
-        return previousMove;
-    }
-
     public void setPreviousMove(Move previousMove) {
         this.previousMove = previousMove;
     }
@@ -115,6 +111,80 @@ public class GameBoardModel implements Observable {
 
     public boolean validatePosition(int x, int y) {
         return tiles[x][y].getPiece() == Piece.EMPTY && previousMove.getPiece().isValidPosition(previousMove.getX(), previousMove.getY(), x, y);
+    }
+
+    public int getScore(boolean color) {
+        int score = 0;
+        //horizontal check
+        for (int y = 0; y < tiles.length; y++) {
+            int som = 0;
+            for (int x = 0; x < tiles[0].length; x++) {
+                som += checkTile(x, y, color);
+            }
+            score += calcScore(som);
+        }
+        // vertical check
+        for (int x = 0; x < tiles[0].length; x++) {
+            int som = 0;
+            for (int y = 0; y < tiles.length; y++) {
+                som += checkTile(x, y, color);
+            }
+            score += calcScore(som);
+        }
+        // diagonal check
+        int y = 0;
+        for (int x = 0; x < tiles[0].length; x++) {
+            // check / diagonals
+            score += checkMainDiag(x, y, color);
+            // check \ diagonals
+            score += checkCoDiag(x, y, color);
+        }
+        int x = 0;
+        for (y = 1; y < tiles.length; y++) {
+            score += checkCoDiag(x, y, color);
+        }
+        x = tiles[0].length - 1;
+        for (y = 1; y < tiles.length; y++) {
+            score += checkMainDiag(x, y, color);
+        }
+        return score;
+    }
+
+    private int checkCoDiag(int x, int y, boolean color) {
+        int som = 0;
+        while (x < tiles[0].length && y < tiles.length) {
+            som += checkTile(x, y, color);
+            x += 1;
+            y += 1;
+        }
+        return calcScore(som);
+    }
+
+    private int checkMainDiag(int x, int y, boolean color) {
+        int som = 0;
+        while (x >= 0 && y < tiles.length) {
+            som += checkTile(x, y, color);
+            x -= 1;
+            y += 1;
+        }
+        return calcScore(som);
+    }
+
+    private int checkTile(int x, int y, boolean color) {
+        Tile tile = tiles[y][x];
+        if (tile.getPiece() != Piece.NULL && tile.getPiece() != Piece.EMPTY && tile.getColor() == color) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    private int calcScore(int i) {
+        if (i > 2) {
+            return i - 2;
+        } else {
+            return 0;
+        }
     }
 
     private void fireInvalidationEvent() {

@@ -84,7 +84,6 @@ public class GameBoardCompanion implements Companion {
     }
 
 
-
     private Tile[] fill_sidePane(boolean color, GameBoardModel model) {
         Tile[] tiles = new Tile[8];
         tiles[0] = new Tile(Piece.PULLER);
@@ -154,7 +153,9 @@ public class GameBoardCompanion implements Companion {
             // send move and quit
             client.sendLine(move.toString());
             //quit
-            quit("the game has ended! - you probably won");
+            int white = boardModel.getScore(true);
+            int black = boardModel.getScore(false);
+            quit("Score: " + white + " - " + black + "!");
         } else {
             // you send last move, opponent can send one more move.
             AwaitResponseTask task = client.getAwaitResponseTask(move.toString());
@@ -181,7 +182,9 @@ public class GameBoardCompanion implements Companion {
                     // opponent skips turn
                     boardModel.setPreviousMove(new Move().setData(0, 0, Piece.EMPTY, false));
                     if (boardModel.isGameEnd()) {
-                        quit("you won, yay!!");
+                        int white = boardModel.getScore(true);
+                        int black = boardModel.getScore(false);
+                        quit("Score: " + white + " - " + black + "!");
                     }
                 } else {
                     quit("Opponent has send an unexpected line");
@@ -221,7 +224,9 @@ public class GameBoardCompanion implements Companion {
             quit("Your opponent was cheating");
         }
         if (boardModel.isGameEnd()) {
-            quit("Calculate Score");
+            int white = boardModel.getScore(true);
+            int black = boardModel.getScore(false);
+            quit("Score: " + white + " - " + black + "!");
         } else {
             if (move.isFinal()) {
                 // opponent send final move
