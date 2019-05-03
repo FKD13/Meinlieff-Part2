@@ -1,5 +1,6 @@
 package Meinlieff.Part1.Updated;
 
+import Meinlieff.Companion;
 import Meinlieff.GameBoard.Move;
 import Meinlieff.GameBoard.Piece;
 import Meinlieff.GameBoard.Tile;
@@ -11,7 +12,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 
-public class PartOneCompantion {
+public class PartOneCompanion implements Companion {
 
     private PartOneClient client;
     private PartOneModel model;
@@ -33,7 +34,7 @@ public class PartOneCompantion {
     @FXML
     public VBox blackSide;
 
-    public PartOneCompantion(String host, int port) {
+    public PartOneCompanion(String host, int port) {
         moves = new ArrayList<>();
         model = new PartOneModel();
         client = new PartOneClient(host, port);

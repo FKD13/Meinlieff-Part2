@@ -15,8 +15,6 @@ import java.util.ArrayList;
 
 /*
 todo:
-    - detect the end of the game: V
-    - calculate score
     - change project to use some more class hierarchy
     - detect possible nullpointers or errors...
     - lots of testing :)
