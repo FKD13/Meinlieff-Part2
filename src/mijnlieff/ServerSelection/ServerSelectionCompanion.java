@@ -44,7 +44,8 @@ public class ServerSelectionCompanion implements Companion {
         errorLabel.getStyleClass().add("warning");
 
         //todo check for other option than textProperty()
-        host.textProperty().addListener((e) -> errorLabel.setVisible(false));
+        host.onActionProperty().addListener(e -> errorLabel.setVisible(false));
+        //host.textProperty().addListener((e) -> errorLabel.setVisible(false));
         port.textProperty().addListener((e) -> errorLabel.setVisible(false));
         username.textProperty().addListener((e) -> errorLabel.setVisible(false));
 

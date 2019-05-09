@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 /*
 todo:
-    - change project to use some more class hierarchy
     - detect possible nullpointers or errors...
     - lots of testing :)
  */
@@ -181,7 +180,6 @@ public class GameBoardCompanion implements Companion {
         AwaitResponseTask task = (AwaitResponseTask) ((Property) o).getBean();
         if (task.getState() == Worker.State.SUCCEEDED) {
             String value = task.getValue().trim();
-            System.out.println(value);
             if (!value.equals("Q")) {
                 // handle incoming move
                 if (value.matches("X [TF] [0-9] [0-9] [+@Xo]")) {
@@ -201,7 +199,6 @@ public class GameBoardCompanion implements Companion {
                 }
                 // send 'X' if necessary
                 int som = possibleMoves();
-                System.out.println("possible positions: " + som);
                 if (som > 0) {
                     // if the incoming move is the final move, you should
                     if (!boardModel.isFinalMove()) {

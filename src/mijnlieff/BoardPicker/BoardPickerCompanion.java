@@ -131,7 +131,7 @@ public class BoardPickerCompanion extends GameBoardCompanionInitializer implemen
             y++;
         }
         if (!errorLabel.isVisible() && (! x_ok || ! y_ok)) {
-            errorLabel.setText("Invalid Field: there should be a tile one the first row and column");
+            errorLabel.setText("Invalid Field: there should be a tile on the first row and column");
             errorLabel.setVisible(true);
         }
         return valid && done == 16 && x_ok && y_ok;

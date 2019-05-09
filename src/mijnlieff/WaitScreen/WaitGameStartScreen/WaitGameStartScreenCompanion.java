@@ -33,7 +33,6 @@ public class WaitGameStartScreenCompanion extends GameBoardCompanionInitializer 
     private void start(Observable o) {
         WaitTask task = (WaitTask) ((Property) o).getBean();
         if (task.getState() == Worker.State.SUCCEEDED) {
-            System.out.println(task.getValue().trim());
             if (task.getValue().trim().matches("X( [0-9]){8}")) {
                 ArrayList<Point> points = parsePoints(task.getValue().trim());
                 if (securityCheck(points)) {
